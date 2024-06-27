@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+import time
 
 import voluptuous as vol
 from selenium import webdriver
@@ -13,11 +14,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, TEMP_CELSIUS
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.event import async_track_time_interval
 
 _LOGGER = logging.getLogger(__name__)
 
-DEFAULT_NAME = 'Water Quality'
+DEFAULT_NAME = 'Clyrpool Water Quality'
 SCAN_INTERVAL = timedelta(minutes=30)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -30,9 +30,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     email = config[CONF_EMAIL]
     password = config[CONF_PASSWORD]
 
-    add_entities([WaterQualitySensor(email, password)], True)
+    add_entities([ClyrpoolWaterQualitySensor(email, password)], True)
 
-class WaterQualitySensor(SensorEntity):
+class ClyrpoolWaterQualitySensor(SensorEntity):
     """Representation of a Sensor."""
 
     def __init__(self, email, password):
@@ -104,7 +104,6 @@ class WaterQualitySensor(SensorEntity):
             submit_button.click()
 
             # Wait for the next page to load
-            driver.get(url)
             time.sleep(10)  # Adjust the sleep time if needed
 
             # Extract the water quality data
@@ -113,6 +112,7 @@ class WaterQualitySensor(SensorEntity):
             self._water_level = driver.find_element(By.XPATH, "//p[text()='Water Level']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Level')]").text
             self._water_temp = driver.find_element(By.XPATH, "//p[text()='Water Temp']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Temp')]").text
 
+            self._state = "OK"
             driver.quit()
 
         except Exception as e:
