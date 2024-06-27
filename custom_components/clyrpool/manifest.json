@@ -1,0 +1,9 @@
+{
+  "domain": "ClyrPool",
+  "name": "Clyr Pool",
+  "version": "1.0.0",
+  "documentation": "n/a",
+  "dependencies": [],
+  "codeowners": ["@Ronyx"],
+  "requirements": ["selenium", "webdriver-manager"]
+}
