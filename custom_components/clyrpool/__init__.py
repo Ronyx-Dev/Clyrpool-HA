@@ -1,1 +1,1 @@
-Clyr Pool Water Quality component.
+"""The Clyrpool Water Quality component."""
