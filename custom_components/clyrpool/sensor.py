@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, TEMP_CELSIUS
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, UnitOfTemperature
 import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class ClyrpoolWaterQualitySensor(SensorEntity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     def update(self):
         """Fetch new state data for the sensor."""
@@ -90,27 +90,62 @@ class ClyrpoolWaterQualitySensor(SensorEntity):
             wait = WebDriverWait(driver, 10)
 
             # Locate the email input field by its ID and enter the email address
+            _LOGGER.debug("Locating email input field")
             email_input = wait.until(EC.presence_of_element_located((By.ID, "Email Address-input")))
             email_input.clear()
             email_input.send_keys(self._email)
+            _LOGGER.debug("Email address entered successfully")
 
             # Locate the password input field by its ID and enter the password
+            _LOGGER.debug("Locating password input field")
             password_input = wait.until(EC.presence_of_element_located((By.ID, "Password-input")))
             password_input.clear()
             password_input.send_keys(self._password)
+            _LOGGER.debug("Password entered successfully")
 
             # Locate the submit button and click it
+            _LOGGER.debug("Locating submit button")
             submit_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']")))
             submit_button.click()
+            _LOGGER.debug("Form submitted successfully")
 
             # Wait for the next page to load
+            driver.get(url)
             time.sleep(10)  # Adjust the sleep time if needed
 
             # Extract the water quality data
-            self._ph = driver.find_element(By.XPATH, "//p[text()='pH']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='pH')]").text
-            self._orp = driver.find_element(By.XPATH, "//p[text()='ORP']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='ORP')]").text
-            self._water_level = driver.find_element(By.XPATH, "//p[text()='Water Level']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Level')]").text
-            self._water_temp = driver.find_element(By.XPATH, "//p[text()='Water Temp']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Temp')]").text
+            _LOGGER.debug("Extracting water quality data")
+            try:
+                ph_element = driver.find_element(By.XPATH, "//p[text()='pH']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='pH')]")
+                self._ph = ph_element.text if ph_element else None
+                _LOGGER.debug("pH value: %s", self._ph)
+            except Exception as e:
+                _LOGGER.error("Error extracting pH value: %s", e)
+                self._ph = None
+
+            try:
+                orp_element = driver.find_element(By.XPATH, "//p[text()='ORP']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='ORP')]")
+                self._orp = orp_element.text if orp_element else None
+                _LOGGER.debug("ORP value: %s", self._orp)
+            except Exception as e:
+                _LOGGER.error("Error extracting ORP value: %s", e)
+                self._orp = None
+
+            try:
+                water_level_element = driver.find_element(By.XPATH, "//p[text()='Water Level']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Level')]")
+                self._water_level = water_level_element.text if water_level_element else None
+                _LOGGER.debug("Water level value: %s", self._water_level)
+            except Exception as e:
+                _LOGGER.error("Error extracting water level value: %s", e)
+                self._water_level = None
+
+            try:
+                water_temp_element = driver.find_element(By.XPATH, "//p[text()='Water Temp']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Temp')]")
+                self._water_temp = water_temp_element.text if water_temp_element else None
+                _LOGGER.debug("Water temperature value: %s", self._water_temp)
+            except Exception as e:
+                _LOGGER.error("Error extracting water temperature value: %s", e)
+                self._water_temp = None
 
             self._state = "OK"
             driver.quit()
@@ -118,3 +153,4 @@ class ClyrpoolWaterQualitySensor(SensorEntity):
         except Exception as e:
             _LOGGER.error(f"An error occurred while updating the sensor: {e}")
             self._state = None
+
