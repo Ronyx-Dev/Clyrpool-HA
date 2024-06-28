@@ -4,5 +4,5 @@
   "documentation": "https://www.example.com",
   "requirements": ["selenium", "webdriver-manager"],
   "dependencies": [],
-  "codeowners": ["@your-github-username"]
+  "codeowners": ["@Ronyx-Dev"]
 }
