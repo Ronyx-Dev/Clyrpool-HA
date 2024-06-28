@@ -119,41 +119,10 @@ class ClyrpoolWaterQualitySensor(SensorEntity):
 
             # Extract the water quality data
             _LOGGER.debug("Extracting water quality data")
-            try:
-                ph_element = driver.find_element(By.XPATH, "//p[text()='pH']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='pH')]")
-                self._ph = ph_element.text if ph_element else None
-                _LOGGER.debug("pH element found: %s", ph_element)
-                _LOGGER.debug("pH value: %s", self._ph)
-            except Exception as e:
-                _LOGGER.error("Error extracting pH value: %s", e)
-                self._ph = None
-
-            try:
-                orp_element = driver.find_element(By.XPATH, "//p[text()='ORP']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='ORP')]")
-                self._orp = orp_element.text if orp_element else None
-                _LOGGER.debug("ORP element found: %s", orp_element)
-                _LOGGER.debug("ORP value: %s", self._orp)
-            except Exception as e:
-                _LOGGER.error("Error extracting ORP value: %s", e)
-                self._orp = None
-
-            try:
-                water_level_element = driver.find_element(By.XPATH, "//p[text()='Water Level']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Level')]")
-                self._water_level = water_level_element.text if water_level_element else None
-                _LOGGER.debug("Water Level element found: %s", water_level_element)
-                _LOGGER.debug("Water level value: %s", self._water_level)
-            except Exception as e:
-                _LOGGER.error("Error extracting water level value: %s", e)
-                self._water_level = None
-
-            try:
-                water_temp_element = driver.find_element(By.XPATH, "//p[text()='Water Temp']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Temp')]")
-                self._water_temp = water_temp_element.text if water_temp_element else None
-                _LOGGER.debug("Water Temp element found: %s", water_temp_element)
-                _LOGGER.debug("Water temperature value: %s", self._water_temp)
-            except Exception as e:
-                _LOGGER.error("Error extracting water temperature value: %s", e)
-                self._water_temp = None
+            self._ph = self.extract_value(driver, "//p[text()='pH']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='pH')]", "pH")
+            self._orp = self.extract_value(driver, "//p[text()='ORP']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='ORP')]", "ORP")
+            self._water_level = self.extract_value(driver, "//p[text()='Water Level']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Level')]", "Water Level")
+            self._water_temp = self.extract_value(driver, "//p[text()='Water Temp']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='Water Temp')]", "Water Temp")
 
             self._state = "OK"
             driver.quit()
@@ -161,3 +130,15 @@ class ClyrpoolWaterQualitySensor(SensorEntity):
         except Exception as e:
             _LOGGER.error(f"An error occurred while updating the sensor: {e}")
             self._state = None
+
+    def extract_value(self, driver, xpath, name):
+        """Helper function to extract value from the web page."""
+        try:
+            element = driver.find_element(By.XPATH, xpath)
+            value = element.text if element else None
+            _LOGGER.debug(f"{name} element found: {element}")
+            _LOGGER.debug(f"{name} value: {value}")
+            return value
+        except Exception as e:
+            _LOGGER.error(f"Error extracting {name} value: {e}")
+            return None
