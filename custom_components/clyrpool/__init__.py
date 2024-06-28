@@ -1,1 +1,1 @@
-"""The Clyrpool Water Quality component."""
+"""Initialize the Clyrpool component."""
