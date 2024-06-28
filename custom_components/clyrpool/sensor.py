@@ -94,6 +94,8 @@ class ClyrpoolSensor(Entity):
             # Add a wait to ensure the next page loads
             wait.until(EC.url_changes(self._url))
             time.sleep(10)  # Adjust the sleep time if needed
+            driver.get(self._url)
+            time.sleep(5)
 
             ph_value = driver.find_element(By.XPATH, "//p[text()='pH']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='pH')]").text
             orp_value = driver.find_element(By.XPATH, "//p[text()='ORP']/ancestor::div[contains(@class, 'MuiPaper-root')]/descendant::p[contains(@class, 'MuiTypography-body1') and not(text()='ORP')]").text
