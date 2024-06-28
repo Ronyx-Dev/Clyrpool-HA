@@ -1,9 +1,8 @@
 {
   "domain": "clyrpool",
-  "name": "Clyrpool Water Quality",
-  "version": "1.0.0",
-  "documentation": "n/a",
+  "name": "Clyrpool",
+  "documentation": "https://www.example.com",
+  "requirements": ["selenium", "webdriver-manager"],
   "dependencies": [],
-  "codeowners": ["@Ronyx"],
-  "requirements": ["selenium", "webdriver-manager"]
+  "codeowners": ["@your-github-username"]
 }
