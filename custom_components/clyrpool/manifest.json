@@ -1,8 +1,9 @@
 {
   "domain": "clyrpool",
-  "name": "Clyrpool",
-  "documentation": "https://www.example.com",
-  "requirements": ["selenium", "webdriver-manager"],
+  "name": "Clyrpool Monitor",
+  "version": "1.0.0",
+  "documentation": "https://example.com",
+  "requirements": ["voluptuous", "selenium", "webdriver-manager"],
   "dependencies": [],
-  "codeowners": ["@Ronyx-Dev"]
+  "codeowners": ["@Ronxy-Dev"]
 }
